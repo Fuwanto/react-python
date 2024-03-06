@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.config.database import engine
-
-# from app.api import router as api_router (soon)
+from core.config.database import Base
+from api.api_router import configure_api_router
 
 app = FastAPI()
 
@@ -18,12 +18,11 @@ app.add_middleware(
 )
 
 # Initialize database
-from core.config.database import Base
-
 Base.metadata.create_all(bind=engine)
 
 # Routes
-# app.include_router(api_router) (soon)
+configure_api_router(app)
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,24 +1,12 @@
-from app.core.config.database import Base
-from sqlalchemy import Boolean, Column, Integer, String
-from sqlalchemy.orm import relationship
-from app.core.models.relations import user_post_likes, user_post_comments
+from core.config.database import Base
+from sqlalchemy import Column, Integer, String
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, index=True, unique=True)
-    email = Column(String, index=True, unique=True)
-    password = Column(String)
-    profile_photo = Column(String, default="default.jpg")
-
-    posts = relationship("Post", back_populates="owner")
-
-    liked_posts = relationship(
-        "Post", secondary=user_post_likes, back_populates="liked_by"
-    )
-
-    commented_posts = relationship(
-        "Post", secondary=user_post_comments, back_populates="commented_by"
-    )
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    username = Column(String(255), index=True, unique=True, nullable=False)
+    email = Column(String(255), index=True, unique=True, nullable=False)
+    hashed_password = Column(String(255), nullable=False)
+    profile_photo = Column(String(255), default="default.jpg")
