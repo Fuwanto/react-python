@@ -1,3 +1,5 @@
+import os
+from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from core.models.user import User
 from core.schemas import UserCreate
@@ -37,3 +39,20 @@ def verify_user_credentials(db: Session, email: str, password: str):
         ):
             return user
     return None
+
+
+def update_profile_photo(db: Session, current_user: User, image: UploadFile):
+    base_directory = "statics/images/users"
+    user_directory = os.path.join(base_directory, str(current_user.id))
+
+    if not os.path.exists(user_directory):
+        os.makedirs(user_directory)
+    file_path = os.path.join(user_directory, "profile_photo.png")
+
+    with open(file_path, "wb") as f:
+        f.write(image.file.read())
+        current_user.set_profile_photo(file_path)
+        db.commit()
+        db.refresh(current_user)
+
+    return current_user

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from api.dependecies import get_db
@@ -6,14 +6,16 @@ from core.crud.user_crud import (
     get_user_by_email,
     create_user_bd,
     verify_user_credentials,
+    update_profile_photo,
 )
-from core.schemas import User, UserCreate, Token
+from core.schemas import UserComplete, UserCreate, Token
+from core.models.user import User
 from core.utils.security import create_access_token, get_current_user
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.post("/create_user", response_model=User)
+@router.post("/create_user", response_model=UserComplete)
 def create_user(
     new_user: UserCreate,
     db: Session = Depends(get_db),
@@ -42,6 +44,16 @@ async def login_for_access_token(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.get("/me", response_model=User)
+@router.get("/me", response_model=UserComplete)
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.put("/update_profile_photo", response_model=UserComplete)
+async def new_profile_photo(
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+
+    return update_profile_photo(db=db, current_user=current_user, image=image)

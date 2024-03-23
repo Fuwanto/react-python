@@ -10,3 +10,7 @@ class User(Base):
     email = Column(String(255), index=True, unique=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     profile_photo = Column(String(255), default="default.jpg")
+
+    def set_profile_photo(self, image_route: str):
+        self.profile_photo = image_route
+        return self
