@@ -37,17 +37,17 @@ def delete_post_by_id(
 
 
 @router.get("/get_post/{post_id}", response_model=PostComplete)
-def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
+async def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
     return get_post(db=db, post_id=post_id)
 
 
 @router.get("/get_posts", response_model=list[PostComplete])
-def get_all_posts(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+async def get_all_posts(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return get_posts(db=db, skip=skip, limit=limit)
 
 
 @router.get("/my_posts", response_model=list[PostComplete])
-def get_posts_by_owner_id(
+async def get_posts_by_owner_id(
     skip: int = 0,
     limit: int = 10,
     db: Session = Depends(get_db),

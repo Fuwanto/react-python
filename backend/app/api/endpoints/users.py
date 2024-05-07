@@ -50,7 +50,7 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 
 
 @router.put("/update_profile_photo", response_model=UserComplete)
-async def new_profile_photo(
+def new_profile_photo(
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
