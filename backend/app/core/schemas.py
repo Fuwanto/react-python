@@ -10,10 +10,11 @@ class Token(BaseModel):
     token_type: str
 
 
-"""/Token schemas"""
-
-
 """User schemas"""
+
+
+class BioSchema(BaseModel):
+    description: str
 
 
 class UserBase(BaseModel):
@@ -27,12 +28,11 @@ class UserCreate(UserBase):
 
 class UserComplete(UserBase):
     id: int
+    bio: Optional[str]
 
     class Config:
         from_attributes = True
 
-
-"""/User schemas"""
 
 """Post schemas"""
 
@@ -40,6 +40,8 @@ class UserComplete(UserBase):
 class PostBase(BaseModel):
     description: str
     owner_id: int
+    owner_username: str
+    category: str
 
 
 class PostComplete(PostBase):
@@ -51,4 +53,26 @@ class PostComplete(PostBase):
         from_attributes = True
 
 
-"""/Post schemas"""
+"""Category schemas"""
+
+
+class CategoryBase(BaseModel):
+    name: str
+    cant: int
+
+
+"""Comment schemas"""
+
+
+class CommentComplete(BaseModel):
+    id: int
+    content: str
+    user_username: str
+    post_id: int
+
+
+"""Like schemas"""
+
+
+class LikeComplete(BaseModel):
+    liked: bool

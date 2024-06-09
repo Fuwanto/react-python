@@ -19,10 +19,6 @@ def create_user_bd(db: Session, new_user: UserCreate):
     return db_user
 
 
-def get_user(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
-
-
 def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
 
@@ -39,6 +35,13 @@ def verify_user_credentials(db: Session, email: str, password: str):
         ):
             return user
     return None
+
+
+def update_bio(db: Session, current_user: User, bio: str):
+    current_user.bio = bio
+    db.commit()
+    db.refresh(current_user)
+    return current_user
 
 
 def update_profile_photo(db: Session, current_user: User, image: UploadFile):

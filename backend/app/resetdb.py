@@ -1,6 +1,10 @@
 from core.config.database import engine
 from core.config.database import Base
-from core.models import post, user, relations
+from core.models.user import User
+from core.models.category import Category
+from core.models.post import Post
+from core.models.comment import Comment
+from core.models.like import Like
 
 
 if __name__ == "__main__":

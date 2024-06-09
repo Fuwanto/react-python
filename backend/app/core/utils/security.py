@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+blacklisted_tokens = set()
+
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -39,6 +41,17 @@ def verify_token(token: str):
         return payload
     except:
         raise credentials_exception
+
+
+def refresh_token(token: str):
+    user = verify_token(token)
+    new_access_token = create_access_token({"sub": user["sub"]})
+    delete_token(token)
+    return {"access_token": new_access_token, "token_type": "bearer"}
+
+
+def delete_token(token: str):
+    blacklisted_tokens.add(token)
 
 
 async def get_current_user(
