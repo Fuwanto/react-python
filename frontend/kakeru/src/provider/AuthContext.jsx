@@ -4,36 +4,12 @@ import { apiService } from '../services/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [token, setToken] = useState(null);
-    const [username, setUsername] = useState(null);
-
-    useEffect(() => {
-        const savedToken = localStorage.getItem('token');
-        const savedUsername = localStorage.getItem('username');
-        if (savedToken) {
-            setToken(JSON.parse(savedToken));
-        }
-        if (savedUsername) {
-            setUsername(savedUsername);
-        }
-    }, []);
+    const [user, setUser] = useState(null);
 
     const login = async (bodyContent) => {
         try {
-            const loginResponse = await apiService.request('/users/login', {
-                method: 'POST',
-                data: bodyContent,
-            });
-            setToken(loginResponse.data);
-            localStorage.setItem('token', JSON.stringify(loginResponse.data));
-            try {
-                let headersList = { "Authorization": `Bearer ${loginResponse.data.access_token}` };
-                const userResponse = await apiService.request('/users/me', { method: 'GET', headers: headersList });
-                setUsername(userResponse.data.username);
-                localStorage.setItem('username', userResponse.data.username);
-            } catch (error) {
-                console.error(error);
-            }
+            await apiService.post('/users/login', bodyContent);
+            await refreshUser();
         } catch (error) {
             console.error(error);
         }
@@ -41,49 +17,29 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            let headersList = {
-                "Authorization": `Bearer ${token.access_token}`
-            };
-            await apiService.request('/users/logout', { method: 'POST', headers: headersList });
-            setToken(null);
-            setUsername(null);
-            localStorage.removeItem('token');
-            localStorage.removeItem('username');
+            await apiService.post('/users/logout');
+            setUser(null);
         } catch (error) {
             console.error(error);
         }
     };
 
-    const refreshToken = async () => {
+    const refreshUser = async () => {
         try {
-            let headersList = {
-                "Authorization": `Bearer ${token.access_token}`
-            };
-            const refreshResponse = await apiService.request('/users/refresh_token', { method: 'POST', headers: headersList });
-            setToken(refreshResponse.data);
-            localStorage.setItem('token', JSON.stringify(refreshResponse.data));
+            const userResponse = await apiService.get('/users/me');
+            setUser(userResponse.data);
         } catch (error) {
             console.error(error);
-            setToken(null);
-            setUsername(null);
-            localStorage.removeItem('token');
-            localStorage.removeItem('username');
+            setUser(null);
         }
     };
 
     useEffect(() => {
-        const intervalId = setInterval(() => {
-            if (token) {
-                refreshToken();
-            }
-        }, 600000); // 10 minutes
-
-        return () => clearInterval(intervalId);
-    }, [token]);
+        refreshUser();
+    }, []);
 
     const contextValue = {
-        token,
-        username,
+        user,
         login,
         logout,
     };

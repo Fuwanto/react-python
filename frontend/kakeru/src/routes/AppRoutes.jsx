@@ -1,34 +1,36 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../provider/AuthContext';
 import Login from '../pages/Login/Login';
 import Logout from '../pages/Logout/Logout';
 import Trends from '../pages/Trends/Trends';
 import Home from '../pages/Home/Home';
 import Register from '../pages/Register/Register';
-import AUserProfile from '../pages/AUserProfile/AUserProfile';
-import MyProfile from '../pages/MyProfile/MyProfile';
+import UserProfile from '../pages/UserProfile/UserProfile';
 
 export const AppRoutes = () => {
-    const { token } = useAuth();
+    const { user } = useAuth();
 
     return (
         <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
-            <Route path="/user/:userUsername" element={<AUserProfile />} />
+            <Route path="/user/:userUsername" element={<UserProfile />} />
             <Route path="/trends" element={<Trends />} />
-            {!token ? (
+            {!user ? (
                 <>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/logout" element={<Navigate to="/" />} />
                 </>
             ) : (
                 <>
-                    <Route path="/me" element={<MyProfile />} />
+                    <Route path="/login" element={<Navigate to="/" />} />
+                    <Route path="/register" element={<Navigate to="/" />} />
                     <Route path="/logout" element={<Logout />} />
                 </>
             )}
         </Routes>
     );
 };
+
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { apiWithoutCredentials } from '../../services/api';
+import { apiService } from '../../services/api';
 
 const Register = () => {
     const [username, setUsername] = useState('');

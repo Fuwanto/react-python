@@ -1,6 +1,14 @@
 import os
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
-from fastapi.responses import FileResponse
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    UploadFile,
+    File,
+    Response,
+)
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from api.dependecies import get_db
@@ -17,8 +25,6 @@ from core.models.user import User
 from core.utils.security import (
     create_access_token,
     get_current_user,
-    refresh_token,
-    delete_token,
     oauth2_scheme,
 )
 
@@ -40,9 +46,11 @@ def create_user(
 # Authentication
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    response: Response,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
     user = verify_user_credentials(db, form_data.username, form_data.password)
     if not user:
@@ -52,19 +60,21 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Create a token
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    response.set_cookie(
+        key="csrf_access_token",
+        value=access_token,
+        httponly=True,
+        secure=True,  # <-- Asegura que esté habilitado en un entorno de producción
+        samesite="None",  # type: ignore
+    )
 
-
-@router.post("/refresh_token", response_model=Token)
-async def refresh_access_token(token: str = Depends(oauth2_scheme)):
-    return refresh_token(token)
+    return {"message": "Login successful"}
 
 
 @router.post("/logout", status_code=200)
-async def logout(token: str = Depends(oauth2_scheme)):
-    delete_token(token)
+async def logout(response: JSONResponse):
+    response.delete_cookie("csrf_access_token")
     return {"message": "Logout successful"}
 
 

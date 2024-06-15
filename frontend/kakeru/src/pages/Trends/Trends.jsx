@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { apiWithoutCredentials } from '../../services/api';
+import { apiService } from '../../services/api';
 import Post from '../../components/Post/Post';
 
 function Gallery() {
     const [mostLikedPosts, setMostLikedPosts] = useState([]);
     useEffect(() => {
-        apiWithoutCredentials.request('stats/most_liked_posts', { method: 'GET' })
+        apiService.request('stats/most_liked_posts', { method: 'GET' })
             .then(response => {
                 setMostLikedPosts(response.data);
             })
@@ -16,7 +16,7 @@ function Gallery() {
 
     const [mostCategories, setMostCategories] = useState([]);
     useEffect(() => {
-        apiWithoutCredentials.request('stats/most_categories', { method: 'GET' })
+        apiService.request('stats/most_categories', { method: 'GET' })
             .then(response => {
                 setMostCategories(response.data);
             })

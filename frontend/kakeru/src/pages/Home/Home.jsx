@@ -1,15 +1,15 @@
 import { React, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { apiWithoutCredentials, getPostImageUrl, getUserImageUrl } from '../../services/api';
+import { apiService, getPostImageUrl, getUserImageUrl } from '../../services/api';
 import { useAuth } from '../../provider/AuthContext';
 import Post from '../../components/Post/Post';
 
 const Home = () => {
-    const { token } = useAuth();
+    const { user, logout } = useAuth();
 
     const [posts, setPosts] = useState([]);
     useEffect(() => {
-        apiWithoutCredentials.request('posts/get_posts', { method: 'GET' })
+        apiService.request('posts/get_posts', { method: 'GET' })
             .then(response => {
                 setPosts(response.data);
             })
@@ -29,7 +29,7 @@ const Home = () => {
                 }
             </section>
             <section>
-                {token ? (
+                {user ? (
                     <>
                         <Link to={`/me`}>View Profile</Link>
                         <Link to="/logout">Logout</Link>

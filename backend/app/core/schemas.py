@@ -2,14 +2,6 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 
 
-"""Token schemas"""
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
 """User schemas"""
 
 
@@ -32,6 +24,15 @@ class UserComplete(UserBase):
 
     class Config:
         from_attributes = True
+
+
+"""Token schemas"""
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserComplete
 
 
 """Post schemas"""

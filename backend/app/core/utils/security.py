@@ -1,15 +1,13 @@
 import os
 from datetime import datetime, timedelta
-from jose import jwt
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from core.crud.user_crud import get_user_by_username
 from api.dependecies import get_db
 from sqlalchemy.orm import Session
+from jose import jwt
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
-blacklisted_tokens = set()
 
 
 def create_access_token(data: dict):
@@ -39,24 +37,25 @@ def verify_token(token: str):
             algorithms=[os.getenv("ALGORITHM", "HS256")],
         )
         return payload
-    except:
+    except jwt.decode.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except jwt.decode.JWTError:
         raise credentials_exception
 
 
-def refresh_token(token: str):
-    user = verify_token(token)
-    new_access_token = create_access_token({"sub": user["sub"]})
-    delete_token(token)
-    return {"access_token": new_access_token, "token_type": "bearer"}
+async def get_current_user(request: Request, db: Session = Depends(get_db)):
+    token = request.cookies.get("csrf_access_token")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
-
-def delete_token(token: str):
-    blacklisted_tokens.add(token)
-
-
-async def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
-):
     user = verify_token(token)
     user_db = get_user_by_username(db, user["sub"])
     if user_db is None:
