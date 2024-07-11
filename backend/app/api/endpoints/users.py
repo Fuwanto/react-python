@@ -65,7 +65,7 @@ async def login_for_access_token(
         key="csrf_access_token",
         value=access_token,
         httponly=True,
-        secure=True,  # <-- Asegura que esté habilitado en un entorno de producción
+        secure=True,
         samesite="None",  # type: ignore
     )
 
@@ -76,9 +76,6 @@ async def login_for_access_token(
 async def logout(response: JSONResponse):
     response.delete_cookie("csrf_access_token")
     return {"message": "Logout successful"}
-
-
-# /Authentication
 
 
 @router.get("/me", response_model=UserComplete)
@@ -98,10 +95,10 @@ async def get_user(user_username: str, db: Session = Depends(get_db)):
 def get_profile_photo(user_id: int):
     base_directory = "statics/images/users"
     user_directory = os.path.join(base_directory, str(user_id))
-    file_path = os.path.join(user_directory, "profile_photo.png")
+    file_path = os.path.join(user_directory, "profile_photo.webp")
 
     if not os.path.exists(file_path):
-        default_directory = os.path.join(base_directory, "default.png")
+        default_directory = os.path.join(base_directory, "default.webp")
         return FileResponse(default_directory)
 
     return FileResponse(file_path)

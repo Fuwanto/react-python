@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Profile from '../../components/Profile/Profile';
 import { useParams } from 'react-router-dom';
-import { apiService } from '../../services/api'; // Importa tu servicio de API con Axios configurado para enviar cookies
+import { apiService } from '../../services/api';
 import { useAuth } from '../../provider/AuthContext';
 
 const UserProfile = () => {

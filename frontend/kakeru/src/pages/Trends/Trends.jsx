@@ -1,8 +1,9 @@
+import './Trends.css';
 import React, { useEffect, useState } from 'react';
 import { apiService } from '../../services/api';
 import Post from '../../components/Post/Post';
 
-function Gallery() {
+function Trends() {
     const [mostLikedPosts, setMostLikedPosts] = useState([]);
     useEffect(() => {
         apiService.request('stats/most_liked_posts', { method: 'GET' })
@@ -27,18 +28,17 @@ function Gallery() {
 
     return (
         <>
-            <section>
+            <section className='liked-posts'>
                 <h2>Most Liked Posts</h2>
                 <ul>
                     {mostLikedPosts.map(post => (
                         <li key={post.id}>
                             <Post post_id={post.id} />
                         </li>
-                    ))
-                    }
+                    ))}
                 </ul>
             </section>
-            <section>
+            <section className='categories'>
                 <h2>Most Categories</h2>
                 <ul>
                     {mostCategories.map(category => (
@@ -46,13 +46,11 @@ function Gallery() {
                             <p>{category.name}</p>
                             <p>{category.cant} posts</p>
                         </li>
-                    ))
-                    }
+                    ))}
                 </ul>
             </section>
         </>
     );
-
 };
 
-export default Gallery;
+export default Trends;

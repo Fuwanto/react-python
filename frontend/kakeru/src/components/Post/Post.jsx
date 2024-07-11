@@ -1,104 +1,119 @@
 import './Post.css';
-import React, { useEffect, useState } from 'react';
-import { apiService, getPostImageUrl } from '../../services/api';
-import { useAuth } from '../../provider/AuthContext';
-import UserHeader from '../UserHeader/UserHeader';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
+import { useAuth } from '../../provider/AuthContext';
+import usePostData from '../../hooks/usePostData';
+import UserHeader from '../UserHeader/UserHeader';
+import Comment from '../Comment/Comment';
+import LikeButton from '../LikeButton/LikeButton';
+import { getPostImageUrl } from '../../services/api';
 
 const Post = ({ post_id }) => {
     const { user } = useAuth();
     const postId = post_id;
 
-    const [post, setPost] = useState({});
-    useEffect(() => {
-        const fetchPost = async () => {
-            try {
-                const response = await apiService.get(`posts/get_post/${postId}`);
-                setPost(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-        fetchPost();
-    }, [postId]);
-
-    const handleLikePost = async (postId) => {
-        try {
-            const response = await apiService.post(`posts/like/${postId}`);
-            if (response.data.liked) {
-                post.likes += 1;
-            } else {
-                post.likes -= 1;
-            }
-            setPost({ ...post });
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    const { post, comments, handleLikePost, handleAddComment } = usePostData(postId);
 
     const [newComment, setNewComment] = useState('');
 
-    const handleCommentPost = async (postId) => {
-        try {
-            const formData = new FormData();
-            formData.append('content', newComment);
-
-            const response = await apiService.post(`posts/comment/${postId}`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-
-            post.comments += 1;
-            setComments([...comments, response.data]);
-        } catch (error) {
-            console.error(error);
-        }
+    const handleComment = async () => {
+        handleAddComment(newComment);
+        setNewComment('');
+        setShowComments(true);
     };
 
+    const [showComments, setShowComments] = useState(false);
 
-    const [comments, setComments] = useState([]);
-    useEffect(() => {
-        const fetchComments = async () => {
-            try {
-                const response = await apiService.get(`posts/comments/${postId}`);
-                setComments(response.data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-        fetchComments();
-    }, [postId]);
+    const toggleComments = () => {
+        setShowComments(!showComments);
+    };
 
     return (
-        <div>
-            <UserHeader userUsername={post.owner} userId={post.owner_id} />
-            <Link to={`/user/${post.owner_username}`}>View Profile</Link>
-            <h1>{post.title}</h1>
-            <p>{post.category}</p>
-            <p>{post.content}</p>
-            <img src={getPostImageUrl(post.owner_id, post.id)} alt={post.title} />
-            <p>{post.likes} likes</p>
-            <p>{post.comments} comments</p>
+        <article className='post'>
+            <UserHeader userUsername={post.owner_username} userId={post.owner_id} />
+            <section className='post-header'>
+                <p className='post-description'>{post.description}</p>
+                <p></p>
+                <p className='post-category'>{post.category}</p>
+            </section>
+
+            <section className='post-content'>
+                <p>{post.content}</p>
+                <picture>
+                    <img src={getPostImageUrl(post.owner_id, post.id)}
+                        alt={`Post image with ${post.description}`}
+                        loading='lazy'
+                        onClick={() => window.open(getPostImageUrl(post.owner_id, post.id), '_blank')}
+                    />
+                </picture>
+            </section>
+
+            <section className='post-cant-likes-comments'>
+
+                <p> <strong>{post.likes}</strong> Likes</p>
+
+                <p><strong>{post.comments}</strong> Comments</p>
+
+            </section>
 
             {user ? (
-                <>
-                    <button onClick={() => handleLikePost(postId)}>Like</button>
-                    <input type="text" value={newComment} onChange={(e) => setNewComment(e.target.value)} />
-                    <button onClick={() => handleCommentPost(postId)}>Comment</button>
-                </>
+                <section>
+
+                    <LikeButton
+                        postId={postId}
+                        handleLike={handleLikePost}
+                    />
+
+                </section>
             ) : (
-                <p>Log in to like or comment</p>
+                <Link to="/login">Log in to like</Link>
             )}
 
-            <ul>
-                {comments.map(comment => (
-                    <li key={comment.id}>
-                        {comment.user_username}
-                        {comment.content}
-                    </li>
-                ))}
-            </ul>
-        </div>
+            <section className='post-comments'>
+
+                <section className='posts-comments-interactions'>
+                    {user ? (
+                        <form onSubmit={handleComment}>
+                            <label>
+                                <input
+                                    className='input-comment'
+                                    type="text"
+                                    placeholder="Add a comment"
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    required />
+                            </label>
+                            <button
+                                className='comment-button' onClick={handleComment}>
+                                {newComment ? 'Comment' : 'Add a comment'}
+                            </button>
+                        </form>
+                    ) : (<Link to="/login">Log in to comment</Link>)
+                    }
+
+                    <button className='show-comments-button' onClick={toggleComments}>
+                        {showComments ? 'Hide Comments' : 'Show Comments'}
+                    </button>
+                </section>
+
+                {showComments && (
+
+                    <section className='comments'>
+                        <ul>
+                            {comments.map(comment => (
+                                <li key={comment.id}>
+                                    <Comment
+                                        userUsername={comment.owner_username} userId={comment.owner_id}
+                                        content={comment.content}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
+
+            </section>
+        </article>
     );
 };
 

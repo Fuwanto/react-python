@@ -2,7 +2,7 @@ import os
 from fastapi import APIRouter, Depends, UploadFile, Form, File
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
-from core.schemas import PostComplete, CommentComplete, LikeComplete
+from core.schemas import PostComplete, CommentComplete
 from core.models.user import User
 from core.utils.security import get_current_user
 from core.crud.post_crud import (
@@ -16,6 +16,7 @@ from core.crud.post_crud import (
     get_comments_by_post,
     delete_comment,
     create_like,
+    liked_post,
 )
 from api.dependecies import get_db
 
@@ -78,7 +79,7 @@ async def get_posts_by_owner_id(
 @router.get("/images/{user_id}/{post_id}")
 async def get_post_image(user_id: int, post_id: int, db: Session = Depends(get_db)):
     base_directory = "statics/images/users"
-    return FileResponse(os.path.join(base_directory, str(user_id), f"{post_id}.png"))
+    return FileResponse(os.path.join(base_directory, str(user_id), f"{post_id}.webp"))
 
 
 """Comments"""
@@ -102,10 +103,19 @@ async def get_comments(post_id: int, db: Session = Depends(get_db)):
 """Likes"""
 
 
-@router.post("/like/{post_id}", response_model=LikeComplete)
+@router.post("/like/{post_id}", response_model=PostComplete)
 async def like_post(
     post_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return {"liked": create_like(db=db, post_id=post_id, user=current_user)}
+    return create_like(db=db, post_id=post_id, user=current_user)
+
+
+@router.get("/liked/{post_id}")
+async def is_liked(
+    post_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return liked_post(db=db, post_id=post_id, user=current_user)

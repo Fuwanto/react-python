@@ -1,9 +1,10 @@
 import os
+import bcrypt
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from core.models.user import User
 from core.schemas import UserCreate
-import bcrypt
+from core.utils.optimize import optimize_and_save_image
 
 
 def create_user_bd(db: Session, new_user: UserCreate):
@@ -50,12 +51,12 @@ def update_profile_photo(db: Session, current_user: User, image: UploadFile):
 
     if not os.path.exists(user_directory):
         os.makedirs(user_directory)
-    file_path = os.path.join(user_directory, "profile_photo.png")
+    file_path = os.path.join(user_directory, "profile_photo.webp")
 
-    with open(file_path, "wb") as f:
-        f.write(image.file.read())
-        current_user.set_profile_photo(file_path)
-        db.commit()
-        db.refresh(current_user)
+    optimize_and_save_image(new_image=image, save_path=file_path)
+
+    current_user.set_profile_photo(file_path)
+    db.commit()
+    db.refresh(current_user)
 
     return current_user

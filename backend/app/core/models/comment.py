@@ -10,7 +10,8 @@ class Comment(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     content = Column(String(255), nullable=False)
     post_id = Column(Integer, ForeignKey("posts.id"), nullable=False)
-    user_username = Column(String(255), ForeignKey("users.username"), nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    owner_username = Column(String(255), ForeignKey("users.username"), nullable=False)
 
     def set_content(self, content: str):
         self.content = content

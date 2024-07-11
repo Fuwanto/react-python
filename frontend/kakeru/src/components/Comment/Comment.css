@@ -1,0 +1,27 @@
+.user-comment {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.user-comment .content-comment {
+    margin-top: 5px;
+    word-wrap: break-word;
+}
+
+.user-comment .content-comment,
+.user-comment .user-header {
+    display: flex;
+    align-items: center;
+}
+
+@media (max-width: 600px) {
+    .user-comment {
+        padding: 8px;
+        margin: 8px 0;
+    }
+}

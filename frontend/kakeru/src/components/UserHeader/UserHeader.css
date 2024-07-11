@@ -1,0 +1,24 @@
+.user-profile-header {
+    display: flex;
+    align-items: center;
+    border-radius: 25px;
+    background-color: #007bff42;
+}
+
+.user-img-icon {
+    border-radius: 50%;
+    margin-right: 10px;
+    width: 50px;
+    height: 50px;
+}
+
+.user-username-link {
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.user-username-link:hover {
+    color: #007BFF;
+    text-decoration: underline;
+}

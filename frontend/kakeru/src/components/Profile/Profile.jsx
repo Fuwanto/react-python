@@ -18,8 +18,7 @@ const Profile = ({ user, isCurrentUser }) => {
 
     return (
         <>
-            <UserHeader userUsername={user.username} />
-            <img src={getUserImageUrl(user.id)} alt="User" />
+            <UserHeader userUsername={user.username} userId={user.id} />
             <h3>Bio: {user.bio}</h3>
             {isCurrentUser && <a href="/edit_profile">Edit Profile</a>}
             <section>

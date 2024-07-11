@@ -6,9 +6,12 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
-    const login = async (bodyContent) => {
+    const login = async (email, password) => {
         try {
-            await apiService.post('/users/login', bodyContent);
+            const formData = new FormData();
+            formData.append('username', email);
+            formData.append('password', password);
+            await apiService.post('/users/login', formData);
             await refreshUser();
         } catch (error) {
             console.error(error);

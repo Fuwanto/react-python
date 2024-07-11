@@ -1,0 +1,95 @@
+.presentation-section {
+    text-align: center;
+    padding: 2rem;
+    background-color: #4CAF50;
+    color: white;
+}
+
+.presentation-section h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.presentation-section h2 {
+    font-size: 1.5rem;
+    font-weight: normal;
+    margin-bottom: 1.5rem;
+}
+
+.presentation-section img {
+    margin-top: 1rem;
+}
+
+.login-section {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.login-section h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.login-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.login-section form label {
+    font-weight: bold;
+}
+
+.login-section form input[type="email"],
+.login-section form input[type="password"] {
+    padding: 0.75rem;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.login-section form button {
+    padding: 0.75rem 1.5rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+
+}
+
+.login-section form button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+}
+
+.login-section form button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.login-section form input:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+}
+
+.login-section a {
+    display: block;
+    margin-top: 1rem;
+    text-decoration: none;
+    color: #4CAF50;
+    transition: color 0.3s ease;
+}
+
+.login-section a:hover {
+    color: #45a049;
+}

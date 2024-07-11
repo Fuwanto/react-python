@@ -6,23 +6,21 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleRegister = async () => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
+
         try {
-
-            let bodyContent = JSON.stringify({
-                "username": username,
-                "email": email,
-                "password": password
-            });
-
-            const response = await apiWithoutCredentials.request('/users/create_user', {
+            const response = await apiService.request('/users/create_user', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                data: bodyContent,
+                data: {
+                    username: username,
+                    email: email,
+                    password: password
+                },
             });
-
 
             if (response.status === 200) {
                 const data = response.data;
@@ -38,25 +36,34 @@ const Register = () => {
 
     return (
         <div>
-            <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-            <button onClick={handleRegister}>Register</button>
+            <h1>Register</h1>
+            <form onSubmit={handleRegister}>
+                <input
+                    type="text"
+                    placeholder="Username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    autoComplete="username"
+                    required
+                />
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    required
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                />
+                <button type="submit">Register</button>
+            </form>
         </div>
     );
 };

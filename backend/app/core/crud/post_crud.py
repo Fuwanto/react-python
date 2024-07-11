@@ -1,4 +1,6 @@
 import os
+import io
+from PIL import Image
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 from core.models.post import Post
@@ -6,6 +8,7 @@ from core.models.user import User
 from core.models.category import Category
 from core.models.like import Like
 from core.models.comment import Comment
+from core.utils.optimize import optimize_and_save_image
 
 
 def save_image(db: Session, image: UploadFile, user: User, db_post: Post):
@@ -17,14 +20,15 @@ def save_image(db: Session, image: UploadFile, user: User, db_post: Post):
     if not os.path.exists(user_directory):
         os.makedirs(user_directory)
 
-    file_path = os.path.join(user_directory, f"{post_id}.png")
+    file_path = os.path.join(user_directory, f"{post_id}.webp")
 
     try:
-        with open(file_path, "wb") as f:
-            f.write(image.file.read())
-            db_post.image_route = file_path
-            db.commit()
-            db.refresh(db_post)
+        optimize_and_save_image(new_image=image, save_path=file_path)
+
+        db_post.image_route = file_path
+        db.commit()
+        db.refresh(db_post)
+
     except FileNotFoundError as e:
         db.delete(db_post)
         db.commit()
@@ -40,8 +44,8 @@ def create_post(
     try:
         db_post = Post(
             description=description,
-            category=category,
-            image_route="default.png",
+            category=category.upper(),
+            image_route="default.webp",
             owner_id=user.id,
             owner_username=user.username,
         )
@@ -87,10 +91,7 @@ def delete_post(db: Session, post_id: int, current_user: User):
     base_directory = "statics/images/users"
     user_directory = os.path.join(base_directory, str(current_user.id))
 
-    if not os.path.exists(user_directory):
-        os.makedirs(user_directory)
-
-    file_path = os.path.join(user_directory, f"{post_id}.png")
+    file_path = os.path.join(user_directory, f"{post_id}.webp")
 
     try:
         os.remove(file_path)
@@ -106,19 +107,21 @@ def delete_post(db: Session, post_id: int, current_user: User):
 """Stats"""
 
 
-def get_most_liked_posts(db: Session, limit: int = 10):
-    return db.query(Post).order_by(Post.likes.desc()).limit(limit).all()
+def get_most_liked_posts(db: Session):
+    return db.query(Post).order_by(Post.likes.desc()).limit(10).all()
 
 
-def get_most_category_posts(db: Session, limit: int = 10):
-    return db.query(Category).order_by(Category.cant.desc()).limit(limit).all()
+def get_most_category_posts(db: Session):
+    return db.query(Category).order_by(Category.cant.desc()).limit(10).all()
 
 
 """Comments"""
 
 
 def create_comment(db: Session, post_id: int, content: str, user: User):
-    db_comment = Comment(content=content, user_username=user.username, post_id=post_id)
+    db_comment = Comment(
+        content=content, owner_id=user.id, owner_username=user.username, post_id=post_id
+    )
     db.add(db_comment)
     db.commit()
     db.refresh(db_comment)
@@ -146,12 +149,12 @@ def create_like(db: Session, post_id: int, user: User):
     like = (
         db.query(Like).filter(Like.post_id == post_id, Like.user_id == user.id).first()
     )
+    post_db = get_post(db, post_id)
     if like:
         db.delete(like)
         db_post = db.query(Post).filter(Post.id == post_id).first()
         db_post.decrease_likes()  # type: ignore
         db.commit()
-        return False
     else:
         db_like = Like(user_id=user.id, post_id=post_id)
         db.add(db_like)
@@ -159,4 +162,11 @@ def create_like(db: Session, post_id: int, user: User):
         db_post.increase_likes()  # type: ignore
         db.commit()
         db.refresh(db_like)
-    return True
+    return post_db
+
+
+def liked_post(db: Session, post_id: int, user: User):
+    like = (
+        db.query(Like).filter(Like.post_id == post_id, Like.user_id == user.id).first()
+    )
+    return like is not None

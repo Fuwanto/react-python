@@ -57,7 +57,8 @@ class PostComplete(PostBase):
 """Category schemas"""
 
 
-class CategoryBase(BaseModel):
+class CategoryComplete(BaseModel):
+    id: int
     name: str
     cant: int
 
@@ -68,12 +69,6 @@ class CategoryBase(BaseModel):
 class CommentComplete(BaseModel):
     id: int
     content: str
-    user_username: str
+    owner_id: int
+    owner_username: str
     post_id: int
-
-
-"""Like schemas"""
-
-
-class LikeComplete(BaseModel):
-    liked: bool
