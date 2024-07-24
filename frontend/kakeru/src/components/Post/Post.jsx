@@ -66,7 +66,8 @@ const Post = ({ post_id }) => {
 
                 </section>
             ) : (
-                <Link to="/login">Log in to like</Link>
+                <button><Link to="/login">Login to like or comment</Link></button>
+
             )}
 
             <section className='post-comments'>
@@ -88,7 +89,7 @@ const Post = ({ post_id }) => {
                                 {newComment ? 'Comment' : 'Add a comment'}
                             </button>
                         </form>
-                    ) : (<Link to="/login">Log in to comment</Link>)
+                    ) : null
                     }
 
                     <button className='show-comments-button' onClick={toggleComments}>

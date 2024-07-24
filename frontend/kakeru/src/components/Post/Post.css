@@ -21,6 +21,22 @@
     margin-top: 15px;
 }
 
+.post a {
+    color: white;
+    text-decoration: none;
+}
+
+.post button {
+    background-color: #008CBA;
+    color: white;
+    margin-top: 10px;
+    max-width: fit-content;
+}
+
+.post button:hover {
+    background-color: #007bb5;
+}
+
 .post-description {
     background-color: #f9f9f979;
     border-radius: 5px;

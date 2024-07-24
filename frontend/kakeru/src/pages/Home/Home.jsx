@@ -12,13 +12,15 @@ const Home = () => {
     const [skip, setSkip] = useState(0);
     const [hasMore, setHasMore] = useState(true);
 
+    const LIMIT = 10;
+
     const fetchPosts = async () => {
         try {
-            const response = await apiService.request(`posts/get_posts?skip=${skip}&limit=2`, { method: 'GET' });
+            const response = await apiService.request(`posts/get_posts?skip=${skip}&limit=${LIMIT}`, { method: 'GET' });
             const newPosts = response.data;
             setPosts([...posts, ...newPosts]);
-            setSkip(skip + 2);
-            if (newPosts.length < 2) {
+            setSkip(skip + LIMIT);
+            if (newPosts.length < LIMIT) {
                 setHasMore(false);
             }
         } catch (error) {
