@@ -28,3 +28,32 @@ Kakeru is a simple social media application where users can post photos. The app
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/Fuwanto/react-python.git
+   ```
+2. **Navigate to the frontend directory**:
+   ```bash
+   cd frontend
+   ```
+3. **Install the dependencies**:
+   ```bash
+   npm install
+   ```
+4. **Start the React development server**:
+   ```bash
+   npm start
+   ```
+5. **Navigate to the backend directory**:
+   ```bash
+   cd backend
+   ```
+6. **Install Python dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+7. **Start the FastAPI server**:
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
